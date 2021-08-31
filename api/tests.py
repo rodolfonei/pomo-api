@@ -9,7 +9,7 @@ class ModelTestCase(TestCase):
         self.pomo_name = "Personal Project - Pomo API"
         self.pomo_observation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         self.pomo_start = timezone.now()
-        self.pomo_end = timezone.now() + datetime.delta(minutes=30)
+        self.pomo_end = timezone.now() + datetime.timedelta(minutes=30)
         self.pomo = Pomo(name=self.pomo_name, observation=self.pomo_observation, start=self.pomo_start, end=self.pomo_end)
 
     def test_model_can_create_a_pomo(self):
