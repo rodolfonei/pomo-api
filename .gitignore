@@ -1,2 +1,3 @@
 pomo_project/settings.py
 __pycache__
+db.sqlite3
