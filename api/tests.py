@@ -1,6 +1,13 @@
 import datetime
+
 from django.test import TestCase
 from django.utils import timezone
+from django.urls import reverse
+# from django.core.urlresolvers import reverse (article code, outdated maybe)
+
+from rest_framework.test import APIClient
+from rest_framework import status
+
 from .models import Pomo
 
 class ModelTestCase(TestCase):
@@ -18,3 +25,24 @@ class ModelTestCase(TestCase):
         self.pomo.save()
         new_count = Pomo.objects.count()
         self.assertNotEqual(old_count, new_count)
+
+class ViewTestCase(TestCase):
+    """Test suite for the api views."""
+
+    def setUp(self):
+        """Define the test client and other test variables."""
+        self.client = APIClient()
+        self.pomo_data = {
+                'name': 'Sketch1 - gamedev',
+                'observation': 'Project setup',
+                'start': timezone.now(),
+                'end': timezone.now() + datetime.timedelta(minutes=30)
+            }
+        self.response = self.client.post(
+            reverse('create'),
+            self.pomo_data,
+            format="json")
+
+    def test_api_can_create_a_pomo(self):
+        """Test the api has pomo creation capability."""
+        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
