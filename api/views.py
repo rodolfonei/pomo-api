@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from rest_framework import generics
+from .serializers import PomoSerializer
+from .models import Pomo
 
-# Create your views here.
+class CreateView(generics.ListCreateAPIView):
+    """This class defines the create behavior of our rest api."""
+    queryset = Pomo.objects.all()
+    serializer_class = PomoSerializer
+
+    def perform_create(self, serializer):
+        """Save the post data when creating a new pomo."""
+        serializer.save()
