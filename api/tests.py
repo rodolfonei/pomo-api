@@ -46,3 +46,31 @@ class ViewTestCase(TestCase):
     def test_api_can_create_a_pomo(self):
         """Test the api has pomo creation capability."""
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+
+    def test_api_can_get_a_pomo(self):
+        """Test the api can get a given pomo."""
+        pomo = Pomo.objects.get()
+        response = self.client.get(
+            reverse('detail', kwargs={'pk': pomo.id}), format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, pomo.id)
+
+    def test_api_can_update_pomo(self):
+        """Test the api can update a given pomo."""
+        pomo = Pomo.objects.get()
+        change_pomo = {"name":"Personal Project - Pomo API 2"}
+        res = self.client.put(reverse('detail', kwargs={'pk': pomo.id}),
+            change_pomo, format='json'
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_api_can_delete_pomo(self):
+        """Test the api can delete a pomo."""
+        pomo = Pomo.objects.get()
+        response = self.client.delete(
+            reverse('detail', kwargs={'pk': pomo.id}),
+            format='json',
+            follow=True)
+
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
