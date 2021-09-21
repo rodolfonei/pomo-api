@@ -3,7 +3,6 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-# from django.core.urlresolvers import reverse (article code, outdated maybe)
 
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -59,7 +58,12 @@ class ViewTestCase(TestCase):
     def test_api_can_update_pomo(self):
         """Test the api can update a given pomo."""
         pomo = Pomo.objects.get()
-        change_pomo = {"name":"Personal Project - Pomo API 2"}
+        change_pomo = {
+            'name': 'Personal Project - Pomo API 2',
+            'observation': 'Description 2',
+            'start': timezone.now(),
+            'end': timezone.now() + datetime.timedelta(minutes=30)
+        }
         res = self.client.put(reverse('detail', kwargs={'pk': pomo.id}),
             change_pomo, format='json'
         )
