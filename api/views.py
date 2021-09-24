@@ -9,7 +9,7 @@ class CreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         """Save the post data when creating a new pomo."""
-        serializer.save()
+        serializer.save(owner=self.request.user)
 
 class DetailView(generics.RetrieveUpdateDestroyAPIView):
     """This class handles the http GET, PUT and DELETE requests."""

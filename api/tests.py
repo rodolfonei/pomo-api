@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
@@ -12,11 +13,12 @@ from .models import Pomo
 class ModelTestCase(TestCase):
     def setUp(self):
         """Define the test client and other test variables."""
+        user = User.objects.create(username="user1")
         self.pomo_name = "Personal Project - Pomo API"
         self.pomo_observation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         self.pomo_start = timezone.now()
         self.pomo_end = timezone.now() + datetime.timedelta(minutes=30)
-        self.pomo = Pomo(name=self.pomo_name, observation=self.pomo_observation, start=self.pomo_start, end=self.pomo_end)
+        self.pomo = Pomo(name=self.pomo_name, observation=self.pomo_observation, start=self.pomo_start, end=self.pomo_end, owner=user)
 
     def test_model_can_create_a_pomo(self):
         """Test the pomo model can create a pomo."""
@@ -30,12 +32,15 @@ class ViewTestCase(TestCase):
 
     def setUp(self):
         """Define the test client and other test variables."""
+        user = User.objects.create(username="user1")
         self.client = APIClient()
+        self.client.force_authenticate(user=user)
         self.pomo_data = {
                 'name': 'Sketch1 - gamedev',
                 'observation': 'Project setup',
                 'start': timezone.now(),
-                'end': timezone.now() + datetime.timedelta(minutes=30)
+                'end': timezone.now() + datetime.timedelta(minutes=30),
+                'owner': user.id
             }
         self.response = self.client.post(
             reverse('create'),
@@ -46,9 +51,15 @@ class ViewTestCase(TestCase):
         """Test the api has pomo creation capability."""
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
 
+    def test_authorization_is_enforced(self):
+        """Test that the api has user authorization."""
+        new_client = APIClient()
+        res = new_client.get('/pomos/', kwargs={'pk': 3}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_api_can_get_a_pomo(self):
         """Test the api can get a given pomo."""
-        pomo = Pomo.objects.get()
+        pomo = Pomo.objects.get(id=1)
         response = self.client.get(
             reverse('detail', kwargs={'pk': pomo.id}), format="json")
 
