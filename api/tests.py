@@ -9,6 +9,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from .models import Pomo
+from .serializers import PomoSerializer
 
 class ModelTestCase(TestCase):
     def setUp(self):
@@ -56,6 +57,13 @@ class ViewTestCase(TestCase):
         new_client = APIClient()
         res = new_client.get('/pomos/', kwargs={'pk': 3}, format="json")
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_api_can_get_all_pomo(self):
+        response = self.client.get(reverse('create'))
+        pomos = Pomo.objects.all()
+        serializer = PomoSerializer(pomos, many=True)
+        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_can_get_a_pomo(self):
         """Test the api can get a given pomo."""
